@@ -127,6 +127,7 @@ public class SdlService extends Service {
 
                     // HMI Status Listener
                     sdlManager.addOnRPCNotificationListener(FunctionID.ON_HMI_STATUS, new OnRPCNotificationListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                         @Override
                         public void onNotified(RPCNotification notification) {
                             OnHMIStatus status = (OnHMIStatus) notification;
@@ -150,7 +151,56 @@ public class SdlService extends Service {
                                         }
                                     }
                                 });
+
+                                if (sdlManager.getAudioStreamManager() != null) {
+                                    Log.i(TAG, "Trying to start audio streaming");
+                                    sdlManager.getAudioStreamManager().start(new CompletionListener() {
+                                        @Override
+                                        public void onComplete(boolean success) {
+                                            if (success) {
+                                                sdlManager.getAudioStreamManager().startAudioStream(false, new CompletionListener() {
+                                                    @Override
+                                                    public void onComplete(boolean success) {
+                                                        if (success) {
+                                                            sdlManager.getAudioStreamManager().pushResource(R.raw.example, new CompletionListener() {
+                                                                @Override
+                                                                public void onComplete(boolean success) {
+                                                                    if (success) {
+                                                                        Log.i(TAG, "Audio file played successfully!");
+                                                                    } else {
+                                                                        Log.i(TAG, "Audio file failed to play!");
+                                                                    }
+                                                                }
+                                                            }, false);
+                                                        } else {
+                                                            Log.d(TAG, "Audio stream failed to start!");
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                Log.i(TAG, "Failed to start audio streaming manager");
+                                            }
+                                        }
+                                    });
+                                }
                             }
+                        }
+                    });
+                    //Take care of the touch events
+                    sdlManager.addOnRPCNotificationListener(FunctionID.ON_TOUCH_EVENT, new OnRPCNotificationListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+                        @Override
+                        public void onNotified(RPCNotification notification) {
+                            sdlManager.getAudioStreamManager().pushResource(R.raw.eine, new CompletionListener() {
+                                @Override
+                                public void onComplete(boolean success) {
+                                    if (success) {
+                                        Log.i(TAG, "Audio file played successfully!");
+                                    } else {
+                                        Log.i(TAG, "Audio file failed to play!");
+                                    }
+                                }
+                            }, true);
                         }
                     });
 
