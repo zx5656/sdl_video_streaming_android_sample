@@ -1,1 +1,2 @@
-include ':app'
+include ':app', ':sdl_android'
+project (":sdl_android").projectDir = new File("../../sdl_java_suite/android/sdl_android")
