@@ -226,6 +226,11 @@ public class SdlService extends Service {
                     return null;
                 }
 
+                @Override
+                public LifecycleConfigurationUpdate managerShouldUpdateLifecycle(Language language, Language hmiLanguage) {
+                    return null;
+                }
+
 
             };
 
